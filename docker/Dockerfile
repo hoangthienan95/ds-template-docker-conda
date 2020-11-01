@@ -25,6 +25,9 @@ RUN adduser --disabled-password \
     --home $HOME \
     $USER
 
+#Newer versions of Docker support copying files as a non-root user,
+# however the version of Docker available on DockerHub does not yet support copying as a non-root user
+# so if you want to set up automated builds for your Git repositories you will need to copy everything as root.
 COPY environment.yml requirements.txt /tmp/
 RUN chown $UID:$GID /tmp/environment.yml /tmp/requirements.txt
 
@@ -78,3 +81,15 @@ ENTRYPOINT [ "/usr/local/bin/entrypoint.sh" ]
 # default command will be to launch JupyterLab server for development
 CMD [ "jupyter", "lab", "--no-browser", "--ip", "0.0.0.0" ]
 
+# build with the following command:
+
+# docker image build \
+#   --build-arg username=$USER \
+#   --build-arg uid=$UID \
+#   --build-arg gid=$GID \
+#   --file Dockerfile \
+#   --tag $IMAGE_NAME:$IMAGE_TAG \
+#   ../
+
+#OR, alternatively,
+#docker-compose up --build
