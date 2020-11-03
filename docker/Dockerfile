@@ -1,3 +1,5 @@
+#from https://towardsdatascience.com/conda-pip-and-docker-ftw-d64fe638dc45
+
 FROM ubuntu:18.04
 
 LABEL maintainer="pughdr <david.pugh@kaust.edu.sa>"
