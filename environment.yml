@@ -3,10 +3,15 @@ name: null
 channels:
   - conda-forge
   - defaults
+  - fastai
 
 dependencies:
+  ### git
   - gh
+  - ghapi
   - git
+
+  ### Jupyter
   - ipython-sql
   - jupyterlab
   - jupyterlab-git
