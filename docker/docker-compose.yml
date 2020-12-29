@@ -18,6 +18,8 @@ services:
       - ../notebooks:/home/${USER}/app/notebooks
       - ../results:/home/${USER}/app/results
       - ../src:/home/${USER}/app/src
+    environment:
+      - DISPLAY
     init: true
     stdin_open: true
     tty: true    

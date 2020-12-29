@@ -12,7 +12,7 @@ RUN apt-get update --fix-missing && \
     rm -rf /var/lib/apt/lists/*
 
 # Create a non-root user
-ARG username=al-khawarizmi
+ARG username=replace-user-here
 ARG uid=1000
 ARG gid=100
 ENV USER $username
@@ -30,8 +30,8 @@ RUN adduser --disabled-password \
 #Newer versions of Docker support copying files as a non-root user,
 # however the version of Docker available on DockerHub does not yet support copying as a non-root user
 # so if you want to set up automated builds for your Git repositories you will need to copy everything as root.
-COPY environment.yml requirements.txt /tmp/
-RUN chown $UID:$GID /tmp/environment.yml /tmp/requirements.txt
+COPY environment.yml environment-extras.yml requirements.txt /tmp/
+RUN chown $UID:$GID /tmp/environment.yml /tmp/environment-extras.yml /tmp/requirements.txt
 
 COPY postBuild /usr/local/bin/postBuild.sh
 RUN chown $UID:$GID /usr/local/bin/postBuild.sh && \
@@ -41,6 +41,7 @@ COPY docker/entrypoint.sh /usr/local/bin/
 RUN chown $UID:$GID /usr/local/bin/entrypoint.sh && \
     chmod u+x /usr/local/bin/entrypoint.sh
 
+#After copying over the config files as root, I switch over to the non-root user
 USER $USER
 
 # install miniconda
@@ -69,11 +70,12 @@ WORKDIR $PROJECT_DIR
 ENV ENV_PREFIX $PROJECT_DIR/env
 RUN conda update --name base --channel defaults conda && \
     conda install mamba -c conda-forge &&\
-    conda env create --prefix $ENV_PREFIX --file /tmp/environment.yml --force && \
+    mamba env create --prefix $ENV_PREFIX --file /tmp/environment.yml --force && \
     conda clean --all --yes
 
 # run the postBuild script to install the JupyterLab extensions
 RUN conda activate $ENV_PREFIX && \
+    #while read extra_pkgs; do conda install -c conda-forge -c defaults --yes $extra_pkgs; done < /tmp/environment-extras.yml &&\
     /usr/local/bin/postBuild.sh && \
     conda deactivate
 
